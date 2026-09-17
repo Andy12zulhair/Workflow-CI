@@ -26,14 +26,14 @@ jobs:
 
       - name: Run MLflow Project
         run: |
-          cd Workflow-CI/MLProject
+          cd MLProject
           mlflow run . --env-manager=local
 
       - name: Commit Saved Artifact to GitHub
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add Workflow-CI/MLProject/saved_model
+          git add MLProject/saved_model
           git diff --quiet && git diff --staged --quiet || git commit -m "chore: save re-trained model artifacts [skip ci]"
           git push
 
@@ -45,8 +45,7 @@ jobs:
 
       - name: Build and Push Docker Image with MLflow
         run: |
-          cd Workflow-CI/MLProject
-          # Ganti <DOCKER_USERNAME> dengan username Anda di bawah ini:
+          cd MLProject
           IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/diabetes-risk-model:latest"
           mlflow models build-docker -m saved_model -n $IMAGE_NAME
           docker push $IMAGE_NAME
