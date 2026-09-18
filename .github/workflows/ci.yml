@@ -68,7 +68,11 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           cd MLProject
-          mlflow models build-docker -m saved_model -n diabetes-risk-model
+          mlflow models build-docker -m saved_model -n diabetes-risk-model --env-manager local || {
+            echo "Fallback: generating Dockerfile with local environment..."
+            mlflow models generate-dockerfile -m saved_model -d docker_dir --env-manager local
+            docker build -t diabetes-risk-model:latest docker_dir
+          }
 
       - name: Log in to Docker Hub
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
